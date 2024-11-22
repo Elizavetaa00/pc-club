@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отзывы</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Компьютерный клуб XYZ</h1>
+        <nav>
+            <ul>
+                <li><a href="about.html">О клубе</a></li>
+                <li><a href="services.html">Услуги и цены</a></li>
+                <li><a href="reviews.html">Отзывы</a></li>
+                <li><a href="booking.html">Бронирование</a></li>
+                <li><a href="contacts.html">Контакты</a></li>
+                <li><a href="login.html">Личный кабинет</a></li>
+            </ul>
+        </nav>
+        <div id="userDisplay" class="username-display"></div>
+    </header>
+    <script>
+        window.onload = function() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const userDisplay = document.getElementById('userDisplay');
+            const loginLink = document.getElementById('loginLink');
+    
+            if (loggedInUser) {
+                userDisplay.innerHTML = `Вы вошли как: ${loggedInUser} <a href="#" id="logoutLink" style="color: #32cd32; margin-left: 10px;">Выйти</a>`;
+                loginLink.style.display = 'none';
+    
+                document.getElementById('logoutLink').onclick = function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem('loggedInUser');
+                    window.location.href = 'login.html';
+                };
+            }
+        };
+    </script>
+    <div class="review-form">
+        <h2 class="centered-text">Оставить отзыв</h2>
+        <form id="reviewForm">
+            <label for="rating">Оценка:</label>
+            <select id="rating" name="rating" required>
+                <option value="5">5 - Отлично</option>
+                <option value="4">4 - Хорошо</option>
+                <option value="3">3 - Нормально</option>
+                <option value="2">2 - Плохо</option>
+                <option value="1">1 - Ужасно</option>
+            </select>
+            <br><br>
+            <label for="comment">Комментарий:</label><br>
+            <textarea id="comment" name="comment" rows="4" cols="50" required></textarea>
+            <br><br>
+            <button type="submit">Отправить отзыв</button>
+        </form>
+    </div>
+
+    <h2 class="centered-text" >Отзывы</h2>
+    <div id="reviewList" class="review-list"></div>
+
+    <script>
+        document.getElementById('reviewForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const rating = document.getElementById('rating').value;
+            const comment = document.getElementById('comment').value;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/submit-review", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    loadReviews();
+                }
+            };
+            xhr.send(JSON.stringify({ rating, comment }));
+
+            document.getElementById('reviewForm').reset();
+        });
+
+        function loadReviews() {
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", "/get-reviews", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const reviews = JSON.parse(xhr.responseText);
+                    const reviewList = document.getElementById('reviewList');
+                    reviewList.innerHTML = ""; 
+
+                    reviews.forEach(review => {
+                        const reviewElement = document.createElement('div');
+                        reviewElement.classList.add('review');
+                        reviewElement.innerHTML = `
+                            <strong>Оценка: ${review.rating}</strong>
+                            <p>${review.comment}</p>
+                        `;
+                        reviewList.appendChild(reviewElement);
+                    });
+                }
+            };
+            xhr.send();
+        }
+
+        window.onload = loadReviews;
+    </script>
+</body>
+</html>

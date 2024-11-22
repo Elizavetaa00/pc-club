@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование</title>
+    <link rel="stylesheet" href="tarif.css">
+</head>
+<body>
+    <header>
+        <h1>Компьютерный клуб XYZ</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="about.html">О клубе</a></li>
+                <li><a href="services.html">Услуги и цены</a></li>
+                <li><a href="reviews.html">Отзывы</a></li>
+                <li><a href="contacts.html">Контакты</a></li>
+                <li><a href="login.html">Личный кабинет</a></li>
+            </ul>
+        </nav>
+        <div id="userDisplay" class="username-display"></div>
+    </header>
+    <script>
+        window.onload = function() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const userDisplay = document.getElementById('userDisplay');
+            const loginLink = document.getElementById('loginLink');
+    
+            if (loggedInUser) {
+                userDisplay.innerHTML = `Вы вошли как: ${loggedInUser} <a href="#" id="logoutLink" style="color: #32cd32; margin-left: 10px;">Выйти</a>`;
+                loginLink.style.display = 'none';
+    
+                document.getElementById('logoutLink').onclick = function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem('loggedInUser');
+                    window.location.href = 'login.html';
+                };
+            }
+        };
+    </script>
+    <div class="tariff-container">
+        <h2 class="centered-text">Тарифы компьютерного клуба XYZ</h2>
+
+        <div class="tariff" id="standardTariff">
+            <h2>Стандартный тариф</h2>
+            <p>Цена: 300 рублей/час</p>
+            <p>Включает: доступ к компьютерам, интернет, напитки.</p>
+            <button onclick="selectTariff('Стандартный тариф')">Выбрать</button>
+        </div>
+
+        <div class="tariff" id="premiumTariff">
+            <h2>Премиум тариф</h2>
+            <p>Цена: 500 рублей/час</p>
+            <p>Включает: доступ к компьютерам, интернет, напитки, снэки.</p>
+            <button onclick="selectTariff('Премиум тариф')">Выбрать</button>
+        </div>
+
+        <div class="tariff" id="vipTariff">
+            <h2>VIP тариф</h2>
+            <p>Цена: 700 рублей/час</p>
+            <p>Включает: доступ к компьютерам, интернет, напитки, снэки, индивидуальное обслуживание.</p>
+            <button onclick="selectTariff('VIP тариф')">Выбрать</button>
+        </div>
+    </div>
+    
+    <script>
+        function selectTariff(tariff) {
+            localStorage.setItem('selectedTariff', tariff);
+            window.location.href = 'seat_selection.html'; 
+        }
+    </script>
+</body>
+</html>

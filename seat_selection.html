@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор места</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+
+        h1, h2 {
+            color: #32cd32;
+            text-shadow: 0 0 5px #32cd32;
+        }
+
+        .map-container {
+            position: relative;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .seat-button {
+            position: absolute;
+            width: 50px;
+            height: 40px;
+            background-color: rgba(218, 241, 218, 0.7);
+            border: 2px solid #000000;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000000;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .seat-button:hover {
+            background-color: rgba(50, 205, 50, 1);
+        }
+
+        .selected {
+            background-color: #7fff00;
+            box-shadow: 0 0 10px #32cd32;
+        }
+
+        .map-image {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            border-radius: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Компьютерный клуб XYZ</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="about.html">О клубе</a></li>
+                <li><a href="reviews.html">Отзывы</a></li>
+                <li><a href="booking.html">Бронирование</a></li>
+                <li><a href="contacts.html">Контакты</a></li>
+                <li><a href="login.html">Личный кабинет</a></li>
+            </ul>
+        </nav>
+        <div id="userDisplay" class="username-display"></div>
+    </header>
+    <script>
+        window.onload = function() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const userDisplay = document.getElementById('userDisplay');
+            const loginLink = document.getElementById('loginLink');
+    
+            if (loggedInUser) {
+                userDisplay.innerHTML = `Вы вошли как: ${loggedInUser} <a href="#" id="logoutLink" style="color: #32cd32; margin-left: 10px;">Выйти</a>`;
+                loginLink.style.display = 'none';
+    
+                document.getElementById('logoutLink').onclick = function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem('loggedInUser');
+                    window.location.href = 'login.html';
+                };
+            }
+        };
+    </script>
+    <h1>Выбор места</h1>
+    <p>Выбранный тариф: <span id="displayTariff"></span></p>
+
+    <div class="map-container">
+        <img src="map.png" alt="Карта клуба" class="map-image" id="seatMap">
+        
+        <!-- Ст -->
+        <div class="seat-button standard-seat" style="top: 40%; left: 50%;" data-seat="Стол 1">Стол 1</div>
+        <div class="seat-button standard-seat" style="top: 40%; left: 60%;" data-seat="Стол 2">Стол 2</div>
+        <div class="seat-button standard-seat" style="top: 40%; left: 70%;" data-seat="Стол 3">Стол 3</div>
+        <div class="seat-button standard-seat" style="top: 40%; left: 80%;" data-seat="Стол 4">Стол 4</div>
+        <div class="seat-button standard-seat" style="top: 40%; left: 90%;" data-seat="Стол 5">Стол 5</div>
+        <div class="seat-button standard-seat" style="top: 56%; left: 50%;" data-seat="Стол 6">Стол 6</div>
+        <div class="seat-button standard-seat" style="top: 56%; left: 60%;" data-seat="Стол 7">Стол 7</div>
+        <div class="seat-button standard-seat" style="top: 56%; left: 70%;" data-seat="Стол 8">Стол 8</div>
+        <div class="seat-button standard-seat" style="top: 56%; left: 80%;" data-seat="Стол 9">Стол 9</div>
+        <div class="seat-button standard-seat" style="top: 56%; left: 90%;" data-seat="Стол 10">Стол 10</div>
+
+        <!-- Пр -->
+        <div class="seat-button premium-seat" style="top: 11%; left: 15%;" data-seat="Комната 1">Комната 1</div>
+        <div class="seat-button premium-seat" style="top: 34%; left: 15%;" data-seat="Комната 2">Комната 2</div>
+        <div class="seat-button premium-seat" style="top: 57%; left: 15%;" data-seat="Комната 3">Комната 3</div>
+        <div class="seat-button premium-seat" style="top: 80%; left: 15%;" data-seat="Комната 4">Комната 4</div>
+
+        <!-- VIP -->
+        <div class="seat-button vip-seat" style="top: 16%; left: 66%;" data-seat="VIP">VIP</div>
+
+    </div>
+
+    <script>
+        const selectedTariff = localStorage.getItem('selectedTariff');
+        document.getElementById('displayTariff').innerText = selectedTariff;
+
+        const standardSeats = document.querySelectorAll('.standard-seat');
+        const premiumSeats = document.querySelectorAll('.premium-seat');
+        const vipSeats = document.querySelectorAll('.vip-seat');
+
+        switch (selectedTariff) {
+            case 'Стандартный тариф':
+                premiumSeats.forEach(seat => seat.classList.add('hidden'));
+                vipSeats.forEach(seat => seat.classList.add('hidden'));
+                break;
+            case 'Премиум тариф':
+                standardSeats.forEach(seat => seat.classList.add('hidden'));
+                vipSeats.forEach(seat => seat.classList.add('hidden'));
+                break;
+            case 'VIP тариф':
+                standardSeats.forEach(seat => seat.classList.add('hidden'));
+                premiumSeats.forEach(seat => seat.classList.add('hidden'));
+                break;
+            default:
+                standardSeats.forEach(seat => seat.classList.add('hidden'));
+                premiumSeats.forEach(seat => seat.classList.add('hidden'));
+                vipSeats.forEach(seat => seat.classList.add('hidden'));
+                break;
+        }
+
+        const seatButtons = document.querySelectorAll('.seat-button');
+        seatButtons.forEach(seat => {
+            seat.onclick = () => selectSeat(seat);
+        });
+
+        function selectSeat(seatElement) {
+            seatButtons.forEach(seat => seat.classList.remove('selected'));
+            seatElement.classList.add('selected');
+
+            const selectedSeat = seatElement.getAttribute('data-seat');
+              localStorage.setItem('selectedSeat', selectedSeat);
+              window.location.href = 'date_time_selection.html';
+        }
+    </script>
+</body>
+</html>

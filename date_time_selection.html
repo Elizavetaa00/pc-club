@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор даты и времени</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+
+        h1, h2 {
+            color: #32cd32;
+            text-shadow: 0 0 5px #32cd32;
+        }
+        
+        .selection-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        label {
+            margin-top: 15px;
+        }
+
+        input, select {
+            margin-top: 5px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #32cd32;
+            background-color: #222;
+            color: #fff;
+            width: 200px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 1px solid #32cd32;
+            background-color: #32cd32;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #28a745;
+        }
+
+        .final-price {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #32cd32;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Компьютерный клуб XYZ</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="about.html">О клубе</a></li>
+                <li><a href="reviews.html">Отзывы</a></li>
+                <li><a href="booking.html">Бронирование</a></li>
+                <li><a href="contacts.html">Контакты</a></li>
+                <li><a href="login.html">Личный кабинет</a></li>
+            </ul>
+        </nav>
+        <div id="userDisplay" class="username-display"></div>
+    </header>
+    <script>
+        window.onload = function() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const userDisplay = document.getElementById('userDisplay');
+            const loginLink = document.getElementById('loginLink');
+    
+            if (loggedInUser) {
+                userDisplay.innerHTML = `Вы вошли как: ${loggedInUser} <a href="#" id="logoutLink" style="color: #32cd32; margin-left: 10px;">Выйти</a>`;
+                loginLink.style.display = 'none';
+    
+                document.getElementById('logoutLink').onclick = function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem('loggedInUser');
+                    window.location.href = 'login.html';
+                };
+            }
+        };
+    </script>
+    <h1>Выбор даты и времени</h1>
+    <div class="selection-container">
+        <p>Выбранный тариф: <span id="displayTariff"></span></p>
+        <p>Выбранный стол: <span id="displaySeat"></span></p>
+
+        <label for="date">Выберите дату:</label>
+        <input type="date" id="date" required>
+        
+        <label for="time">Выберите время начала:</label>
+        <input type="time" id="time" min="10:00" max="20:00" required>
+
+        <label for="duration">Выберите продолжительность (в часах):</label>
+        <select id="duration" required>
+            <option value="1">1 час</option>
+            <option value="2">2 часа</option>
+            <option value="3">3 часа</option>
+            <option value="4">4 часа</option>
+            <option value="5">5 часов</option>
+        </select>
+
+        <div class="final-price" id="finalPrice"></div>
+
+        <button onclick="submitSelection()">Оплатить</button>
+    </div>
+
+    <script>
+        const selectedTariff = localStorage.getItem('selectedTariff');
+        const selectedSeat = localStorage.getItem('selectedSeat');
+
+        document.getElementById('displayTariff').innerText = selectedTariff;
+        document.getElementById('displaySeat').innerText = selectedSeat;
+
+        const tariffPrices = {
+            'Стандартный тариф': 300,
+            'Премиум тариф': 500,
+            'VIP тариф': 700
+        };
+
+        const dateInput = document.getElementById('date');
+        const now = new Date();
+        dateInput.min = now.toISOString().split("T")[0];
+
+        function updateFinalPrice() {
+            const duration = document.getElementById('duration').value;
+            const pricePerHour = tariffPrices[selectedTariff] || 0;
+            const finalPrice = pricePerHour * duration;
+
+            document.getElementById('finalPrice').innerText = `Итоговая цена: ${finalPrice} рублей`;
+        }
+
+        document.getElementById('duration').addEventListener('change', updateFinalPrice);
+
+        function validateTime() {
+            const selectedDate = new Date(dateInput.value);
+            const currentTime = new Date();
+            const timeInput = document.getElementById('time');
+
+            if (selectedDate.toDateString() === currentTime.toDateString()) {
+                const currentHours = currentTime.getHours();
+                const currentMinutes = currentTime.getMinutes();
+                let formattedTime = currentHours + ":" + (currentMinutes < 10 ? "0" + currentMinutes : currentMinutes);
+
+                timeInput.min = formattedTime;
+            } else {
+                timeInput.min = "10:00";
+            }
+        }
+
+        dateInput.addEventListener('change', validateTime);
+        
+        function submitSelection() {
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const duration = document.getElementById('duration').value;
+            const pricePerHour = tariffPrices[selectedTariff] || 0;
+            const finalPrice = pricePerHour * duration;
+            
+            const selectedDateTime = new Date(`${date}T${time}`);
+            if (selectedDateTime < now) {
+                alert('Ошибка: Выбранное время недоступно, так как оно уже прошло.');
+                return;
+            }
+
+            if (date && time) {
+        const selectedDateTime = `${date}T${time}`;
+        localStorage.setItem('selectedDateTime', selectedDateTime);
+        localStorage.setItem('selectedPrice', finalPrice);
+
+
+                window.location.href = 'oplata.html';
+            } else {
+                alert('Пожалуйста, выберите дату и время.');
+            }
+        }
+        
+
+        updateFinalPrice();
+        validateTime();
+    </script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оплата</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+
+        h1, h2 {
+            color: #32cd32;
+            text-shadow: 0 0 5px #32cd32;
+        }
+
+        .payment-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            margin-top: 15px;
+        }
+
+        input {
+            margin-top: 5px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #32cd32;
+            background-color: #222;
+            color: #fff;
+            width: 200px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 1px solid #32cd32;
+            background-color: #32cd32;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Компьютерный клуб XYZ</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="about.html">О клубе</a></li>
+                <li><a href="reviews.html">Отзывы</a></li>
+                <li><a href="booking.html">Бронирование</a></li>
+                <li><a href="contacts.html">Контакты</a></li>
+                <li><a href="login.html">Личный кабинет</a></li>
+            </ul>
+        </nav>
+        <div id="userDisplay" class="username-display"></div>
+    </header>
+    <script>
+        window.onload = function() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const userDisplay = document.getElementById('userDisplay');
+            const loginLink = document.getElementById('loginLink');
+    
+            if (loggedInUser) {
+                userDisplay.innerHTML = `Вы вошли как: ${loggedInUser} <a href="#" id="logoutLink" style="color: #32cd32; margin-left: 10px;">Выйти</a>`;
+                loginLink.style.display = 'none';
+    
+                document.getElementById('logoutLink').onclick = function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem('loggedInUser');
+                    window.location.href = 'login.html';
+                };
+            }
+        };
+    </script>
+    <h1>Оплата</h1>
+    <div class="payment-container">
+        <p>Выбранный тариф: <span id="displayTariff"></span></p>
+        <p>Выбранный стол: <span id="displaySeat"></span></p>
+        <p>Дата: <span id="displayDate"></span></p>
+        <p>Время: <span id="displayTime"></span></p>
+        <p>Итоговая цена: <span id="displayPrice"></span> рублей</p>
+
+        <label for="cardNumber">Номер карты:</label>
+        <input type="text" id="cardNumber" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" required>
+
+        <label for="expiryDate">Срок действия:</label>
+        <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5" required>
+
+        <label for="cvv">CVV:</label>
+        <input type="text" id="cvv" placeholder="XXX" maxlength="3" required>
+
+        <button onclick="processPayment()">Оплатить</button>
+    </div>
+
+    <script>
+        const selectedTariff = localStorage.getItem('selectedTariff');
+        const selectedSeat = localStorage.getItem('selectedSeat');
+        const selectedDate = localStorage.getItem('selectedDate');
+        const selectedTime = localStorage.getItem('selectedTime');
+        const selectedPrice = localStorage.getItem('selectedPrice');
+
+        document.getElementById('displayTariff').innerText = selectedTariff;
+        document.getElementById('displaySeat').innerText = selectedSeat;
+        document.getElementById('displayDate').innerText = selectedDate;
+        document.getElementById('displayTime').innerText = selectedTime;
+        document.getElementById('displayPrice').innerText = selectedPrice;
+
+        const cardNumberInput = document.getElementById('cardNumber');
+        cardNumberInput.addEventListener('input', function () {
+            let value = cardNumberInput.value.replace(/\s+/g, '');
+            if (value.length > 16) value = value.slice(0, 16);
+            cardNumberInput.value = value.replace(/(.{4})/g, '$1 ').trim();
+        });
+
+        const expiryDateInput = document.getElementById('expiryDate');
+        expiryDateInput.addEventListener('input', function () {
+            let value = expiryDateInput.value.replace(/\//g, '');
+            if (value.length > 4) value = value.slice(0, 4);
+            if (value.length > 2) {
+                expiryDateInput.value = value.slice(0, 2) + '/' + value.slice(2);
+            } else {
+                expiryDateInput.value = value;
+            }
+        });
+
+        function validateCardNumber(cardNumber) {
+            const cardPattern = /^\d{4}\s\d{4}\s\d{4}\s\d{4}$/;
+            return cardPattern.test(cardNumber);
+        }
+
+        function validateExpiryDate(expiryDate) {
+            const expiryPattern = /^(0[1-9]|1[0-2])\/\d{2}$/;
+            return expiryPattern.test(expiryDate);
+        }
+
+        function validateCVV(cvv) {
+            const cvvPattern = /^\d{3}$/;
+            return cvvPattern.test(cvv);
+        }
+
+        function processPayment() {
+    const cardNumber = document.getElementById('cardNumber').value;
+    const expiryDate = document.getElementById('expiryDate').value;
+    const cvv = document.getElementById('cvv').value;
+
+    if (!validateCardNumber(cardNumber)) {
+        alert('Введите корректный номер карты в формате XXXX XXXX XXXX XXXX');
+        return;
+    }
+
+    if (!validateExpiryDate(expiryDate)) {
+        alert('Введите корректный срок действия в формате MM/YY');
+        return;
+    }
+
+    if (!validateCVV(cvv)) {
+        alert('Введите корректный CVV код (3 цифры)');
+        return;
+    }
+
+    alert('Платеж успешно обработан!');
+    
+    localStorage.setItem('paymentStatus', 'successful');
+
+    window.location.href = 'final.html';
+}
+    </script>
+</body>
+</html>

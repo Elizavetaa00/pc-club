@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Компьютерный клуб XYZ</h1>
+        <nav>
+            <ul>
+                <li><a href="about.html">О клубе</a></li>
+                <li><a href="services.html">Услуги и цены</a></li>
+                <li><a href="reviews.html">Отзывы</a></li>
+                <li><a href="booking.html">Бронирование</a></li>
+                <li><a href="contacts.html">Контакты</a></li>
+                <li><a href="login.html">Личный кабинет</a></li>
+            </ul>
+        </nav>
+        <div id="userDisplay" class="username-display"></div>
+    </header>
+
+    <div class="reg-container">
+        <h2 class="centered-text">Регистрация</h2>
+        <form onsubmit="return validateEmail()">
+            <label for="username">Имя пользователя</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="confirmPassword">Подтвердите пароль</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        <p id="regMessage"></p>
+        <p id="loginMessage"></p>
+        <p class="centered-text">Уже есть аккаунт? <a href="login.html">Войти</a></p>
+    </div>
+
+    <script>
+        function validateEmail() {
+            const email = document.getElementById("email").value;
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|mail\.ru|yahoo\.com|outlook\.com|yandex\.ru)$/;
+
+            if (!emailPattern.test(email)) {
+                alert("Пожалуйста, введите допустимый email с одним из следующих доменов: gmail.com, mail.ru, yahoo.com, outlook.com, yandex.ru.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+
+    <script src="auth.js"></script>
+</body>
+</html>
